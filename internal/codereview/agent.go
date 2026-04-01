@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/components/model"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -131,7 +132,8 @@ func (e *Agent) Run(ctx context.Context, prURL string) (string, error) {
 
 	explorerReviewerLoop, err := adk.NewLoopAgent(
 		ctx, &adk.LoopAgentConfig{
-			Name: "exploration_reviewer_loop",
+			Name:        "exploration_reviewer_loop",
+			Description: "Review agent loop",
 			SubAgents: []adk.Agent{
 				explorer, reviewer, loopBreak,
 			},
@@ -220,6 +222,9 @@ func (e *Agent) Run(ctx context.Context, prURL string) (string, error) {
 		if event.Err != nil {
 			return "", event.Err
 		}
+
+		b, _ := json.MarshalIndent(event, "", "    ")
+		log.Println(string(b))
 
 		msg, _, err := adk.GetMessage(event)
 		if err != nil {

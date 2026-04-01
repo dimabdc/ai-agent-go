@@ -42,7 +42,7 @@ const plannerPrompt = `
 
 ## Формат
 Краткий список шагов (bullet points)
-Делегируй работу агенту "exploration_reviewer_loop"
+Делегируй работу агенту "exploration_reviewer_loop" продолжения review
 `
 const explorerPrompt = `
 Ты — Explorer агент.
