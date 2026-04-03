@@ -33,12 +33,12 @@ func NewPostCommentTool(
 func (t *PostCommentTool) Info(_ context.Context) (*schema.ToolInfo, error) {
 	return &schema.ToolInfo{
 		Name: "post_comment",
-		Desc: `Опубликовать комментарий к задачи. Используй для отправки отчета.`,
+		Desc: "Posting a comment",
 		ParamsOneOf: schema.NewParamsOneOfByParams(
 			map[string]*schema.ParameterInfo{
 				"comment": {
 					Type:     schema.String,
-					Desc:     "Текст комментария",
+					Desc:     "Comment text",
 					Required: true,
 				},
 			},

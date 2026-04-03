@@ -50,17 +50,18 @@ func (a *Agent) GenerateReport(ctx context.Context, taskKey string) (string, err
 		return "", fmt.Errorf("failed to get task %s: %w", taskKey, err)
 	}
 
-	prs := make(map[int]*gitea2.PullRequest, len(task.PRLinks))
+	prs := make(map[string]*gitea2.PullRequest, len(task.PRLinks))
 	var changes []string
 	for num, prLink := range task.PRLinks {
 		pr, err := a.getPRInfo(prLink)
 		if err != nil {
 			continue
 		}
-		prs[num] = pr
+		rpCode := fmt.Sprintf("pr-%d", num)
+		prs[rpCode] = pr
 
 		changeText := fmt.Sprintf("**PR %d:**\n", num+1)
-		changeText += fmt.Sprintf("Ref (приватный): %d\n", num)
+		changeText += fmt.Sprintf("Code (приватный, для запросов в инструментах): %s\n", rpCode)
 		changeText += fmt.Sprintf("Link: %s\n", prLink)
 		changes = append(changes, changeText)
 	}
@@ -133,7 +134,7 @@ func (a *Agent) GenerateReport(ctx context.Context, taskKey string) (string, err
 			schema.UserMessage(
 				fmt.Sprintf(
 					"Название задачи: %s\nОписание задачи: %s\n\n"+
-						"Проанализируй pull requests:\n\n%s\n\nРезультат анализа опубликуй комментарием к задаче.",
+						"Проанализируй pull requests:\n\n%s\n\n",
 					task.Summary, task.Description, strings.Join(changes, "\n"),
 				),
 			),

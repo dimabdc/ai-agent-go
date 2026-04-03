@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
@@ -19,13 +20,13 @@ const (
 // GetPRDiffTool - инструмент для получения диффа pull request
 type GetPRDiffTool struct {
 	client *gitea.Client
-	prs    map[int]*gitea2.PullRequest
+	prs    map[string]*gitea2.PullRequest
 }
 
 // NewGetPRDiffTool создает новый инструмент GetPRDiffTool
 func NewGetPRDiffTool(
 	client *gitea.Client,
-	prs map[int]*gitea2.PullRequest,
+	prs map[string]*gitea2.PullRequest,
 ) *GetPRDiffTool {
 	return &GetPRDiffTool{
 		client: client,
@@ -40,9 +41,9 @@ func (t *GetPRDiffTool) Info(ctx context.Context) (*schema.ToolInfo, error) {
 		Desc: "Get the unified diff content of a pull request from Gitea.",
 		ParamsOneOf: schema.NewParamsOneOfByParams(
 			map[string]*schema.ParameterInfo{
-				"ref": {
-					Type:     schema.Integer,
-					Desc:     "Идентификатор Pull Request",
+				"pr_code": {
+					Type:     schema.String,
+					Desc:     "Pull request code",
 					Required: true,
 				},
 			},
@@ -53,16 +54,16 @@ func (t *GetPRDiffTool) Info(ctx context.Context) (*schema.ToolInfo, error) {
 // InvokableRun выполняет инструмент
 func (t *GetPRDiffTool) InvokableRun(_ context.Context, argsJSON string, _ ...tool.Option) (string, error) {
 	var params struct {
-		Ref int `json:"ref"`
+		Code string `json:"pr_code"`
 	}
 
 	if err := json.Unmarshal([]byte(argsJSON), &params); err != nil {
 		return "", fmt.Errorf("failed to parse input: %w", err)
 	}
 
-	pr, ok := t.prs[params.Ref]
+	pr, ok := t.prs[strings.TrimSpace(params.Code)]
 	if !ok {
-		return fmt.Sprintf("PR `%d` not found", params.Ref), nil
+		return fmt.Sprintf("PR `%s` not found", params.Code), nil
 	}
 
 	diff, err := t.client.GetPRDiff(pr.Head.Repository.Owner.UserName, pr.Head.Repository.Name, pr.Index)

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
@@ -14,12 +15,12 @@ import (
 
 type ListFilesTool struct {
 	giteaClient *gitea.Client
-	prs         map[int]*gitea2.PullRequest
+	prs         map[string]*gitea2.PullRequest
 }
 
 func NewListFilesTool(
 	giteaClient *gitea.Client,
-	prs map[int]*gitea2.PullRequest,
+	prs map[string]*gitea2.PullRequest,
 ) *ListFilesTool {
 	return &ListFilesTool{
 		giteaClient: giteaClient,
@@ -30,12 +31,12 @@ func NewListFilesTool(
 func (t *ListFilesTool) Info(_ context.Context) (*schema.ToolInfo, error) {
 	return &schema.ToolInfo{
 		Name: "list_files",
-		Desc: "Получает список всех файлов в измененной ветке.",
+		Desc: "Gets a list of all files in the modified branch.",
 		ParamsOneOf: schema.NewParamsOneOfByParams(
 			map[string]*schema.ParameterInfo{
-				"ref": {
+				"pr_code": {
 					Type:     schema.String,
-					Desc:     "Идентификатор Pull Request",
+					Desc:     "Pull request code",
 					Required: true,
 				},
 			},
@@ -45,16 +46,16 @@ func (t *ListFilesTool) Info(_ context.Context) (*schema.ToolInfo, error) {
 
 func (t *ListFilesTool) InvokableRun(_ context.Context, argsJSON string, _ ...tool.Option) (string, error) {
 	var params struct {
-		Ref int `json:"ref"`
+		Code string `json:"pr_code"`
 	}
 
 	if err := json.Unmarshal([]byte(argsJSON), &params); err != nil {
 		return "", fmt.Errorf("failed to parse input: %w", err)
 	}
 
-	pr, ok := t.prs[params.Ref]
+	pr, ok := t.prs[strings.TrimSpace(params.Code)]
 	if !ok {
-		return fmt.Sprintf("PR `%d` not found", params.Ref), nil
+		return fmt.Sprintf("PR `%s` not found", params.Code), nil
 	}
 
 	files, err := t.giteaClient.ListFiles(
@@ -63,10 +64,10 @@ func (t *ListFilesTool) InvokableRun(_ context.Context, argsJSON string, _ ...to
 		pr.Head.Ref,
 	)
 	if err != nil {
-		return "", fmt.Errorf("не удалось получить список файлов: %w", err)
+		return "", fmt.Errorf("failed to get list files: %w", err)
 	}
 
-	result := "Список файлов в PR:\n"
+	result := "List files in PR:\n"
 	for _, file := range files {
 		result += fmt.Sprintf("- %s\n", file)
 	}

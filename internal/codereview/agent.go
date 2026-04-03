@@ -125,6 +125,9 @@ func (e *Agent) Run(ctx context.Context, prURL string) (string, error) {
 					},
 					UnknownToolsHandler: internal.UnknownToolsHandler,
 				},
+				ReturnDirectly: map[string]bool{
+					"loop_break": true,
+				},
 			},
 		},
 	)
@@ -188,11 +191,7 @@ func (e *Agent) Run(ctx context.Context, prURL string) (string, error) {
 	// Создаем входные данные для adk.Agent
 	agentInput := []adk.Message{
 		schema.UserMessage(
-			fmt.Sprintf(
-				"%sПроанализируй pull request.\n"+
-					"Результат анализа опубликуй комментарием к PR.",
-				taskPrompt,
-			),
+			fmt.Sprintf("%sПроанализируй pull request.\n", taskPrompt),
 		),
 	}
 
