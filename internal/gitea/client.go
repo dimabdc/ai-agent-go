@@ -4,6 +4,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"context"
 	"fmt"
+	"io"
 )
 
 // Client - клиент для работы с Gitea API
@@ -97,4 +98,15 @@ func (c *Client) ListPRFiles(owner, repo string, index int64) ([]*gitea.ChangedF
 	}
 
 	return files, nil
+}
+
+// GetArchive получает tar.gz архив репозитория из Gitea API
+func (c *Client) GetArchive(owner, repo string, ref string) (io.ReadCloser, error) {
+	file, _, err := c.gitea.GetArchiveReader(owner, repo, ref, gitea.TarGZArchive)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tar archive: %w", err)
+	}
+
+	// Возвращаем ReadCloser через bytes.NewReader
+	return file, nil
 }

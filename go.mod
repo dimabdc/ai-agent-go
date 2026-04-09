@@ -3,6 +3,7 @@ module ai-agent-go
 go 1.25.7
 
 require (
+	github.com/cloudwego/eino-ext/adk/backend/local v0.2.4
 	github.com/cloudwego/eino-ext/components/model/openai v0.1.10
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/kentaro-m/blackfriday-confluence v0.0.0-20220126124413-8e85477b49b3
@@ -10,6 +11,7 @@ require (
 )
 
 require (
+	github.com/bmatcuk/doublestar/v4 v4.10.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

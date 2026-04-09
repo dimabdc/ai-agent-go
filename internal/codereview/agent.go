@@ -3,12 +3,15 @@ package codereview
 import (
 	"ai-agent-go/internal"
 	"ai-agent-go/internal/jira"
+	"ai-agent-go/internal/utils"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/cloudwego/eino/adk"
+	"github.com/cloudwego/eino/adk/middlewares/filesystem"
 	"github.com/cloudwego/eino/components/model"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -24,9 +27,10 @@ import (
 var jiraTaskRegexp = regexp.MustCompile("#(\\w+-\\d+)")
 
 type Agent struct {
-	giteaClient *gitea.Client
-	model       model.ToolCallingChatModel
-	jiraClient  *jira.Client
+	giteaClient      *gitea.Client
+	model            model.ToolCallingChatModel
+	jiraClient       *jira.Client
+	archiveExtractor *utils.ArchiveExtractor
 }
 
 func NewCodeReviewAgent(
@@ -36,9 +40,10 @@ func NewCodeReviewAgent(
 ) (*Agent, error) {
 
 	return &Agent{
-		giteaClient: giteaClient,
-		model:       model,
-		jiraClient:  jiraClient,
+		giteaClient:      giteaClient,
+		model:            model,
+		jiraClient:       jiraClient,
+		archiveExtractor: utils.NewArchiveExtractor(),
 	}, nil
 }
 
@@ -51,6 +56,42 @@ func (e *Agent) Run(ctx context.Context, prURL string) (string, error) {
 	pr, err := e.giteaClient.GetPullRequestInfo(owner, repo, prNumber)
 	if err != nil {
 		return "", fmt.Errorf("failed to get PR info: %w", err)
+	}
+
+	dir, err := os.MkdirTemp("", "ai-agent-*")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp dir: %w", err)
+	}
+	defer os.RemoveAll(dir)
+
+	archive, err := e.giteaClient.GetArchive(owner, repo, pr.Head.Ref)
+	if err != nil {
+		return "", fmt.Errorf("failed to get archive: %w", err)
+	}
+
+	err = e.archiveExtractor.Extract(archive, dir)
+	if err != nil {
+		return "", fmt.Errorf("failed to extract archive: %w", err)
+	}
+
+	backend, err := internal.NewWrappedLocalBackend(ctx, filepath.Join(dir, repo))
+	if err != nil {
+		panic(err)
+	}
+
+	middleware, err := filesystem.New(
+		ctx, &filesystem.MiddlewareConfig{
+			Backend: backend,
+			WriteFileToolConfig: &filesystem.ToolConfig{
+				Disable: true,
+			},
+			EditFileToolConfig: &filesystem.ToolConfig{
+				Disable: true,
+			},
+		},
+	)
+	if err != nil {
+		return "", fmt.Errorf("failed to create filesystem middleware: %w", err)
 	}
 
 	taskPrompt := ""
@@ -91,13 +132,10 @@ func (e *Agent) Run(ctx context.Context, prURL string) (string, error) {
 			Instruction: explorerPrompt,
 			ToolsConfig: adk.ToolsConfig{
 				ToolsNodeConfig: compose.ToolsNodeConfig{
-					Tools: []tool.BaseTool{
-						codereviewtools.NewListFilesTool(e.giteaClient, pr),
-						codereviewtools.NewGetFileContentTool(e.giteaClient, pr),
-					},
 					UnknownToolsHandler: internal.UnknownToolsHandler,
 				},
 			},
+			Handlers: []adk.ChatModelAgentMiddleware{middleware},
 		},
 	)
 
