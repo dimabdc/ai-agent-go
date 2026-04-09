@@ -28,10 +28,7 @@ type Options struct {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load()
 
 	var opts Options
 	parser := flags.NewParser(&opts, flags.Default|flags.HelpFlag)
