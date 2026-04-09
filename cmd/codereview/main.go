@@ -1,19 +1,19 @@
 package main
 
 import (
-	"ai-agent-go/internal/gitea"
-	"ai-agent-go/internal/jira"
 	"context"
 	"errors"
 	"fmt"
 	einopenai "github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/dimabdc/ai-agent-go/internal/gitea"
+	"github.com/dimabdc/ai-agent-go/internal/jira"
 	"log"
 	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/joho/godotenv"
 
-	"ai-agent-go/internal/codereview"
+	"github.com/dimabdc/ai-agent-go/internal/codereview"
 )
 
 // Options - конфигурация Code Review Agent через CLI и env переменные

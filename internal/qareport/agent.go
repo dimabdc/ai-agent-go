@@ -1,26 +1,26 @@
 package qareport
 
 import (
-	"ai-agent-go/internal"
 	gitea2 "code.gitea.io/sdk/gitea"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cloudwego/eino/adk"
+	"github.com/dimabdc/ai-agent-go/internal"
 	"os"
 	"strconv"
 	"strings"
 
-	"ai-agent-go/internal/qareport/tools"
+	"github.com/dimabdc/ai-agent-go/internal/qareport/tools"
 
 	"github.com/cloudwego/eino/components/model"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 
-	"ai-agent-go/internal/gitea"
-	"ai-agent-go/internal/jira"
+	"github.com/dimabdc/ai-agent-go/internal/gitea"
+	"github.com/dimabdc/ai-agent-go/internal/jira"
 )
 
 // Agent handles QA report generation.

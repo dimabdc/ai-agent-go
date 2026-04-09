@@ -1,15 +1,15 @@
 package codereview
 
 import (
-	"ai-agent-go/internal"
-	"ai-agent-go/internal/jira"
-	"ai-agent-go/internal/utils"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/cloudwego/eino/adk"
 	"github.com/cloudwego/eino/adk/middlewares/filesystem"
 	"github.com/cloudwego/eino/components/model"
+	"github.com/dimabdc/ai-agent-go/internal"
+	"github.com/dimabdc/ai-agent-go/internal/jira"
+	"github.com/dimabdc/ai-agent-go/internal/utils"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -20,8 +20,8 @@ import (
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
 
-	codereviewtools "ai-agent-go/internal/codereview/tools"
-	"ai-agent-go/internal/gitea"
+	codereviewtools "github.com/dimabdc/ai-agent-go/internal/codereview/tools"
+	"github.com/dimabdc/ai-agent-go/internal/gitea"
 )
 
 var jiraTaskRegexp = regexp.MustCompile("#(\\w+-\\d+)")

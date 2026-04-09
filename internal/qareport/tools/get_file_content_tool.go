@@ -9,7 +9,7 @@ import (
 	"github.com/cloudwego/eino/schema"
 	"strings"
 
-	"ai-agent-go/internal/gitea"
+	"github.com/dimabdc/ai-agent-go/internal/gitea"
 )
 
 // GetFileContentTool - инструмент для получения содержимого файла

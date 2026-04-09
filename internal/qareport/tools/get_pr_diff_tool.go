@@ -10,7 +10,7 @@ import (
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/schema"
 
-	"ai-agent-go/internal/gitea"
+	"github.com/dimabdc/ai-agent-go/internal/gitea"
 )
 
 const (

@@ -9,7 +9,7 @@ import (
 	bfconfluence "github.com/kentaro-m/blackfriday-confluence"
 	bf "github.com/russross/blackfriday/v2"
 
-	"ai-agent-go/internal/jira"
+	"github.com/dimabdc/ai-agent-go/internal/jira"
 )
 
 // PostCommentTool - инструмент для публикации комментария

@@ -1,18 +1,18 @@
 package main
 
 import (
-	"ai-agent-go/internal/gitea"
-	"ai-agent-go/internal/jira"
 	"context"
 	"errors"
 	"fmt"
 	einopenai "github.com/cloudwego/eino-ext/components/model/openai"
+	"github.com/dimabdc/ai-agent-go/internal/gitea"
+	"github.com/dimabdc/ai-agent-go/internal/jira"
 	"github.com/jessevdk/go-flags"
 	"github.com/joho/godotenv"
 	"log"
 	"time"
 
-	"ai-agent-go/internal/qareport"
+	"github.com/dimabdc/ai-agent-go/internal/qareport"
 )
 
 // Options - конфигурация QA Agent через CLI и env переменные
